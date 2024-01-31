@@ -25,6 +25,6 @@ console.log(existingUser);
         }
     } else {
         throw new Error('User not found')
-        return { error: "User not found." };
+        // return { error: "User not found." };
     }
 })
