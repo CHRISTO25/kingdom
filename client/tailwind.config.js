@@ -6,7 +6,9 @@ export default {
     fontFamily:{
       pS:["Poor Story","system-ui"],
       rS:["Rubik Scribble","system-ui"],
-      mT:["Miltonian Tattoo","serif"]
+      mT:["Miltonian Tattoo","serif"],
+      eB:['EB Garamond', 'serif'],
+      cG:['Cormorant Garamond','serif']
     },
     extend: {},
   },

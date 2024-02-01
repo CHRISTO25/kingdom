@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import logo from '/logo.png'
 import { NavLink } from 'react-router-dom'
-import Button from '../../common/Button';
 import { CgProfile } from "react-icons/cg";
 import { AiFillMessage } from "react-icons/ai";
 import { IoNotificationsCircleSharp } from "react-icons/io5";
@@ -16,7 +15,8 @@ function Header() {
     let [open, setOpen] = useState(false)
     return (
         <>
-            <div className='shadow-md w-full fixed top-0 left-0'>
+        {/* fixed =>to set navbar always there */}
+            <div className='shadow-md w-full  top-0 left-0'>
                 <div className='md:flex bg-black py-4 md:px-10 px-4 items-center justify-between sm:h-px md:h-10 lg:h-20'>
                     {/* logo and name */}
                     <div className='text-4xl text-white ml-2 transform transition duration-150 ease-in-out hover:scale-110 
@@ -30,7 +30,7 @@ function Header() {
                     </div>
                     {/* heading */}
                     <div className='transform transition duration-150 ease-in-out hover:scale-110 hover:translate-x-2'>
-                        <h1 className='text-white  hover:text-opacity-75 no-underline font-pS text-6xl sm:text-4xl md:text-5xl '>
+                        <h1 className='text-white  hover:text-opacity-75 no-underline font-cG text-6xl sm:text-4xl md:text-5xl '>
                             World of Jobs</h1>
                     </div>
 
