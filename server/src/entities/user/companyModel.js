@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 
-const userSchema = mongoose.Schema({
+const companySchema = mongoose.Schema({
     name:{
         type:String,
         required:true
@@ -9,19 +9,17 @@ const userSchema = mongoose.Schema({
     idName:{
         type:String,
         required:true,
-        
+        unique:true
     },
     email:{
         type:String,
-        required:true, 
+        required:true,
+        unique:true
     },
     phone:{
         type:Number,
         required:true,
-    },
-    job:{
-        type:String,
-        required:true
+        unique:true
     },
     password:{
         type:String,
@@ -40,12 +38,12 @@ const userSchema = mongoose.Schema({
     },
     position:{
         type:String,
-        default:"worker"
+        default:"Company"
     }
 },{
     timestamps:true
 })
 
-const User = mongoose.model('User',userSchema)
+const Company = mongoose.model('Company',companySchema)
 
-export default User;
+export default Company;

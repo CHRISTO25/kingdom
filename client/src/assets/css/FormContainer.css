@@ -1,0 +1,56 @@
+.adjust{
+    background: transparent ;
+    border-radius: 25px;
+    background: rgba(0, 0, 0, .2);
+    color: white !important;
+    border-color: aliceblue;
+  
+  }
+  
+  
+  .adjust  input[type=email]{
+     
+     background: transparent;
+     background: rgba(227, 227, 227, 0.1);
+     border-color:  rgb(255, 255, 255);
+     color: rgb(255, 255, 255) !important;
+  }
+  
+  
+  .adjust  input[type=number]{
+     
+    background: transparent;
+    background: rgba(227, 227, 227, 0.1);
+    border-color:  rgb(255, 255, 255);
+    color: rgb(255, 255, 255);
+  }
+  .adjust  input[type=text]{
+     
+    background: transparent;
+    background: rgba(227, 227, 227, 0.1);
+    border-color:  rgb(255, 255, 255);
+    color: rgb(255, 255, 255);
+  }
+  
+  .adjust select{
+      background: transparent;
+      background: rgba(227, 227, 227, 0.1);
+      border-color:  rgb(255, 255, 255);
+      color: rgb(0, 0, 0);
+  }
+  
+  .adjust input[type=password]{ 
+    
+      background: transparent;
+      background: rgba(227, 227, 227, 0.1);
+      border-color:  rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+   }
+  
+   .adjust input[type=password]::placeholder,
+   .adjust input[type=text]::placeholder,
+   .adjust input[type=email]::placeholder,
+   .adjust input[type=number]::placeholder {
+       color: rgb(255, 255, 255);
+   }
+   

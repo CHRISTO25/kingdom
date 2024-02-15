@@ -1,9 +1,12 @@
 import asyncHandler from 'express-async-handler'
 import User from '../entities/user/userModel.js'
+import Company from '../entities/user/companyModel.js';
+import Jobs from '../entities/user/jobsModel.js';
 
-
+// Finding user using email.
 export const findUserByEmail = asyncHandler(async(email)=>{
     try {
+
         const userData = await User.findOne({email});
         return userData
     } catch (error) {
@@ -12,9 +15,36 @@ export const findUserByEmail = asyncHandler(async(email)=>{
     }
 })
 
-export const saveUser =asyncHandler(async(name,idName,email,job,phone,password)=>{
+// Finding company using email.
+export const findCompanyByEmail = asyncHandler(async(email)=>{
     try {
-        const user = await User.create({
+        const companyData = await Company.findOne({email});
+        return companyData
+    } catch (error) {
+        console.log(error);
+        throw error
+    }
+})
+
+
+// Finding job using name
+export const findJobByName = asyncHandler(async(jobs)=>{
+    try {
+        const jobData = await Jobs.findOne({name:jobs});
+        return jobData
+    } catch (error) {
+        console.log(error);
+        throw error
+    }
+})
+
+
+// Saving user.
+export const saveUser = asyncHandler(async(name,idName,email,job,phone,password)=>{
+    try {
+        console.log("============================ivdea varunundu mwneaaaaa=========================================");
+        console.log(name,idName,email,job,phone,password);
+        const users = await User.create({
             name,
             idName,
             email,
@@ -22,8 +52,25 @@ export const saveUser =asyncHandler(async(name,idName,email,job,phone,password)=
             phone,
             password
          });
-    return await user.save();
-   
+    return await users.save();
+    } catch (error) {
+        console.log(error);
+        throw error
+    }
+
+})
+
+//saving company.
+export const saveCompany =asyncHandler(async(name,idName,email,phone,password)=>{
+    try {
+        const company = await Company.create({
+            name,
+            idName,
+            email,
+            phone,
+            password
+         });
+    return await company.save();
 
     } catch (error) {
         console.log(error);
@@ -31,3 +78,19 @@ export const saveUser =asyncHandler(async(name,idName,email,job,phone,password)=
     }
 
 })
+
+
+//save new job
+export const saveJobs = asyncHandler(async(name)=>{
+    try {
+        const Job = await Jobs.create({
+            name
+        })
+        return await Job.save()
+    } catch (error) {
+        console.log(error);
+        throw error
+    }
+})
+
+  

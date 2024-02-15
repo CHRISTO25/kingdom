@@ -4,6 +4,7 @@ import connectDB from './config/mongoDB.js';
 import { notFound,errorHandler } from './middlewares/errorMiddleware.js';
 import cookieParser from 'cookie-parser';
 import userRoutes from './interfaces/routes/user/userRoutes.js'
+import cors from "cors"
 
 
 dotenv.config();
@@ -16,6 +17,10 @@ const app  = express()
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({extended:true}))
+
+
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+
 
 app.use('/api/users',userRoutes);
 // app.use('/api/admin',);

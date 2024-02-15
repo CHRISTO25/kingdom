@@ -3,23 +3,19 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import {
-  createBrowserRouter,
-  createRoutesFromElements,
-  Route,
-  RouterProvider
-} from 'react-router-dom'
+import store from './redux/store.js'
+import { BrowserRouter } from 'react-router-dom'
+import { Provider } from 'react-redux'
 
-const router =createBrowserRouter(
-  createRoutesFromElements(
-    <Route path='/' element={<App/>}>
-
-    </Route>
-  )
-)
-
-ReactDOM.createRoot(document.getElementById('root')).render(
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  
   <React.StrictMode>
-   <RouterProvider router={router} />
-  </React.StrictMode>,
+    <BrowserRouter>
+    <Provider store={store}>
+    <App />
+    </Provider>
+    </BrowserRouter>
+  </React.StrictMode>
+
 )
