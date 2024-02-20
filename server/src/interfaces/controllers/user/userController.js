@@ -4,6 +4,7 @@ import { loginUser } from '../../../usecases/userUseCases/loginUser.js';
 import { createUser } from '../../../usecases/userUseCases/signupUser.js';
 import { createCompany } from '../../../usecases/userUseCases/signupCompany.js';
 import { logout } from '../../../middlewares/logout.js';
+import { allJobs } from '../../../repositories/userRepositoty.js';
 
 
 
@@ -28,9 +29,9 @@ export const userLogin = asyncHandler(async (req, res) => {
 // user signup ====================public
 export const userSignup = asyncHandler(async (req, res) => {
   try {
-    const { name, idName, email, job, phone, password } = await req.body;
+    const { name, idName, email,jobselect,job, phone, password } = await req.body;
     console.log(name, idName, email, job, phone, password);
-    const signupResponse = await createUser(res, name, idName, email, job, phone, password)
+    const signupResponse = await createUser(res, name, idName, email,jobselect, job, phone, password)
     const { data, token } = signupResponse
     if (token) {
       res.json({ data, token })
@@ -70,4 +71,16 @@ export const userLogout = asyncHandler(async (req, res) => {
     throw new Error('logout cancelled')
   }
 
+})
+
+
+// geting all jobs 
+export const availableJobs =  asyncHandler(async(req,res)=>{
+  try {
+     const jobs = await allJobs()
+     res.json({jobs})
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Something error happened" });
+  }
 })

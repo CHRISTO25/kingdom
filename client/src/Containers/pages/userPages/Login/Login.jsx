@@ -7,6 +7,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import FormContainer from '../../../../Components/common/FormContainer';
 import { toast } from 'react-toastify';
+import { validateEmail,validatePassword } from '../../../utils/formValidation';
 
 function Login() {
     const [position, setPosition] = useState('');
@@ -16,51 +17,19 @@ function Login() {
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [response, setResponse] = useState('')
-
-    const validateEmail = () => {
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if (!email) {
-            setEmailError('Email is required');
-        } else if (!emailPattern.test(email)) {
-            setEmailError('Invalid email address');
-        } else {
-            setEmailError('');
-        }
-    };
+    
 
 
-    const validatePassword = () => {
-        const specialCharacterPattern = /[!@#$%^&*(),.?":{}|<>]/;
-        const uppercaseLetterPattern = /[A-Z]/;
-        const lowercaseLetterPattern = /[a-z]/;
-        const numberPattern = /\d/;
-
-        if (!password) {
-            setPasswordError('Password is required');
-        } else if (password.length < 5) {
-            setPasswordError('Password must be at least 5 characters long');
-        } else if (!uppercaseLetterPattern.test(password)) {
-            setPasswordError('Password must contain at least one uppercase letter');
-        } else if (!lowercaseLetterPattern.test(password)) {
-            setPasswordError('Password must contain at least one lowercase letter');
-        } else if (!numberPattern.test(password)) {
-            setPasswordError('Password must contain at least one number');
-        } else if (!specialCharacterPattern.test(password)) {
-            setPasswordError('Password must contain at least one special character');
-        } else {
-            setPasswordError('');
-        }
-    };
-
-
+const validateForm =async ()=>{
+  {email? setEmailError(validateEmail(email)):null}
+   {password?setPasswordError(validatePassword(password)):null}
+}
+     
     //connecting to backend  
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [login, { isLoading }] = useLoginMutation() //this login is called from userApiSlice
-
     const { userInfo } = useSelector((state) => state.auth)
-
     useEffect(() => {
         if (userInfo) {
             navigate('/')
@@ -68,24 +37,12 @@ function Login() {
     }, [navigate, userInfo])
 
 
-
-
-
+//form submissions
     const submitHandler = async (e) => {
-        e.preventDefault();
-
-        // Validate email and password before submitting
-        validateEmail();
-        validatePassword();
-
-        // Proceed with submission logic if validation passes
-
-
+        e.preventDefault();      
         try {
-            if (!emailError && !passwordError) {
-
-
-                const res = await login({ email, password , position }).unwrap();//this login is called from userApiSlice
+            if (email && password && !emailError && !passwordError  ) {
+                const res = await login({ email, password, position }).unwrap();//this login is called from userApiSlice
                 const Token = res.token
                 console.log(Token, "ithaaanu mwne token");
                 if (Token) {
@@ -93,20 +50,17 @@ function Login() {
                     navigate('/')
                 }
                 setResponse(res.data)
-
             }
-
         } catch (err) {
             toast.error(err?.data?.message || err.error);
         }
-
-
     };
+
 
     return (
         <div className='FormContainer '>
             <FormContainer pos={'fixed'} >
-            <h1 className="text-center w-full font-pS">SC Kingdom</h1> 
+                <h1 className="text-center w-full font-pS">SC Kingdom</h1>
                 {/* ... (rest of the code) */}
                 <Form className='form-manager' onSubmit={submitHandler}>
                     <Form.Group className={`w-4/5 text-white focus:outline-none  from-black 
@@ -148,7 +102,7 @@ function Login() {
                             value={email}
                             onChange={(e) => {
                                 setEmail(e.target.value);
-                                validateEmail();
+                                validateForm(email)
                             }}
                             onBlur={validateEmail} // Validate on blur as well
                             className={`w-4/5 text-white focus:outline-none bg-gradient-to-r from-black 
@@ -164,7 +118,7 @@ function Login() {
                             value={password}
                             onChange={(e) => {
                                 setPassword(e.target.value);
-                                validatePassword();
+                                validateForm(password)
                             }}
                             onBlur={validatePassword} // Validate on blur as well
                             className={`w-4/5 text-white focus:outline-none bg-gradient-to-r from-black 

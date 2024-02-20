@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Form, Button, Row } from 'react-bootstrap';
+import userAxios from '../../../../Axios/userAxios'
 import FormContainer from '../../../../Components/common/FormContainer';
 
 function Signup() {
@@ -22,10 +23,24 @@ function Signup() {
     const [passwordError, setPasswordError] = useState('');
     const [confirmPasswordError, setConfirmPasswordError] = useState('');
     const [formError, setFormError] = useState('');
+    
+
+    const [availableJobs,setAvailableJobs]= useState('')
+
+// backend calls 
+
+useEffect(() => {
+    const fetchUsers = async () => {
+      const jobDetails = await userAxios.get('http://localhost:3000/api/users/jobsName')
+      console.log(jobDetails.data.jobs, "======================")
+      setAvailableJobs(jobDetails.data.jobs)
+    }
+    fetchUsers();
+  },[])
+
 
     const validateEmail = () => {
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
         if (!email) {
             setEmailError('Email is required');
         } else if (!emailPattern.test(email)) {
@@ -62,15 +77,12 @@ function Signup() {
         setEmail(e.target.value);
         validateEmail();
     };
-
     const handlePasswordChange = (e) => {
         setPassword(e.target.value);
         validatePassword();
     };
-
     const submitHandler = async (e) => {
         e.preventDefault();
-
         setFormError('');
         setNameError('');
         setIdNameError('');
@@ -79,38 +91,25 @@ function Signup() {
         setJobError('');
         setPasswordError('');
         setConfirmPasswordError('');
-
         if (!name) {
             setNameError('Name is required');
         }
-
         if (!idName) {
             setIdNameError('IdName is required');
         }
-
         if (!validatePhoneNumber(phone)) {
             setPhoneError('Invalid phone number');
         }
-
         if (!selectedJob && !job) {
             setJobError('Please select a job or type a job');
         }
-
         if (!validatePassword(password)) {
             setPasswordError('Password should be at least 6 characters long');
         }
-
         if (password !== confirmPassword) {
             setConfirmPasswordError('Passwords do not match');
         }
-
-        console.log('Form submitted successfully');
-
-
-       
-
-
-
+        //write logic here
     };
 
     return (
@@ -179,13 +178,20 @@ function Signup() {
                             onChange={(e) => {
                                 setSelectedJob(e.target.value);
                                 setJobError('');
-                                setJob('');
+                               
                             }}
                         >
                             <option value="" disabled>Select an option</option>
-                            <option value="option1" className="text-black">option 1</option>
-                            <option value="option2" className="text-black">Option 2</option>
-                            <option value="option3" className="text-black">Option 3</option>
+                            
+                          {availableJobs?(
+                              availableJobs.map((job)=>{
+                                return(
+                                    <option value={job.name} className="text-black">{job.name}</option>
+                                )
+                            })
+                          ):null}
+                           
+                            
                         </Form.Select>
                         {jobError && <div className="invalid-feedback">{jobError}</div>}
                     </Form.Group>
@@ -198,7 +204,7 @@ function Signup() {
                             onChange={(e) => {
                                 setJob(e.target.value);
                                 setJobError('');
-                                setSelectedJob('');
+                                
                             }}
                             className={`w-full max-w-md text-white focus:outline-none ${jobError ? 'is-invalid' : ''}`}
                             disabled={selectedJob ? true : false}
@@ -217,7 +223,7 @@ function Signup() {
                         {passwordError && <div className="invalid-feedback">{passwordError}</div>}
                     </Form.Group>
 
-                    <Form.Group className="my-3 ml-10" controlId="password">
+                    <Form.Group className="my-3 ml-10" controlId="confirm_password">
                         <Form.Control
                             type="password"
                             placeholder="Confirm Password"

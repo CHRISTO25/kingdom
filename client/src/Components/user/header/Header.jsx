@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState ,useEffect} from 'react'
 import logo from '/logo.png'
 import { NavLink } from 'react-router-dom'
 import { CgProfile } from "react-icons/cg";
@@ -7,7 +7,9 @@ import { IoNotificationsCircleSharp } from "react-icons/io5";
 import {useSelector,useDispatch} from 'react-redux'
 import { useLogoutMutation } from '../../../redux/userSlice/usersApiSlice';
 import { logout } from '../../../redux/userSlice/authSlice';
+
 import { useNavigate } from 'react-router-dom'
+
 
 
 function Header() {
@@ -17,6 +19,7 @@ function Header() {
         { name: <CgProfile />, link: "/profile", content: "Profile" },
     ];
     let [open, setOpen] = useState(false)
+  
 
 
     const {userInfo} = useSelector((state)=>state.auth)
@@ -24,7 +27,10 @@ function Header() {
     const [logoutApiCall] = useLogoutMutation()
     const dispatch = useDispatch()
     const navigate = useNavigate()
+
+
     
+  
     const logoutHandler=async ()=>{
         try {
           

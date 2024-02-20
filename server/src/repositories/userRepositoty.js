@@ -38,6 +38,17 @@ export const findJobByName = asyncHandler(async(jobs)=>{
     }
 })
 
+// get all jobs in the database
+export const allJobs = asyncHandler(async()=>{
+    try {
+        const job = await Jobs.find()
+       
+        return job
+    } catch (error) {
+        console.log(error);
+        throw error
+    }
+})
 
 // Saving user.
 export const saveUser = asyncHandler(async(name,idName,email,job,phone,password)=>{
@@ -93,4 +104,3 @@ export const saveJobs = asyncHandler(async(name)=>{
     }
 })
 
-  
