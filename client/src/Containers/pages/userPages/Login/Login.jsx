@@ -7,7 +7,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import FormContainer from '../../../../Components/common/FormContainer';
 import { toast } from 'react-toastify';
-import { validateEmail,validatePassword } from '../../../utils/formValidation';
+import { validateEmail, validatePassword } from '../../../utils/formValidation';
 
 function Login() {
     const [position, setPosition] = useState('');
@@ -17,14 +17,13 @@ function Login() {
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [response, setResponse] = useState('')
-    
 
+    //validations
+    const validateForm = async () => {
+        { email ? setEmailError(validateEmail(email)) : null }
+        { password ? setPasswordError(validatePassword(password)) : null }
+    }
 
-const validateForm =async ()=>{
-  {email? setEmailError(validateEmail(email)):null}
-   {password?setPasswordError(validatePassword(password)):null}
-}
-     
     //connecting to backend  
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -37,11 +36,11 @@ const validateForm =async ()=>{
     }, [navigate, userInfo])
 
 
-//form submissions
+    //form submissions
     const submitHandler = async (e) => {
-        e.preventDefault();      
+        e.preventDefault();
         try {
-            if (email && password && !emailError && !passwordError  ) {
+            if (email && password && !emailError && !passwordError) {
                 const res = await login({ email, password, position }).unwrap();//this login is called from userApiSlice
                 const Token = res.token
                 console.log(Token, "ithaaanu mwne token");

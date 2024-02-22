@@ -1,8 +1,10 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Form, Button, Row } from 'react-bootstrap';
-import userAxios from '../../../../Axios/userAxios'
+import { Form, Button, Row, Col } from 'react-bootstrap';
+import userAxios from '../../../../Axios/userAxios';
 import FormContainer from '../../../../Components/common/FormContainer';
+import { validateEmail, validatePassword, validateName, validateIdName, 
+    validatePhoneNumber ,validateConfirmPassword } from '../../../utils/formValidation';
 
 function Signup() {
     const [name, setName] = useState('');
@@ -22,94 +24,60 @@ function Signup() {
     const [jobError, setJobError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [confirmPasswordError, setConfirmPasswordError] = useState('');
-    const [formError, setFormError] = useState('');
-    
 
-    const [availableJobs,setAvailableJobs]= useState('')
+    const [availableJobs, setAvailableJobs] = useState('');
 
-// backend calls 
+    // backend calls
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const jobDetails = await userAxios.get('http://localhost:3000/api/users/jobsName');
+                setAvailableJobs(jobDetails.data.jobs);
+            } catch (error) {
+                console.error('Error fetching job details:', error);
+            }
+        };
+        fetchUsers();
+    }, []);
 
-useEffect(() => {
-    const fetchUsers = async () => {
-      const jobDetails = await userAxios.get('http://localhost:3000/api/users/jobsName')
-      console.log(jobDetails.data.jobs, "======================")
-      setAvailableJobs(jobDetails.data.jobs)
-    }
-    fetchUsers();
-  },[])
 
 
-    const validateEmail = () => {
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!email) {
-            setEmailError('Email is required');
-        } else if (!emailPattern.test(email)) {
-            setEmailError('Invalid email address');
-        } else {
-            setEmailError('');
-        }
+
+    // Validations on form submission
+    const validateForm = async () => {
+       
+        setNameError(name ? await validateName(name) : null);
+        setIdNameError(idName ? await validateIdName(idName) : null);
+        setEmailError(email ? await validateEmail(email) : null);
+        setPhoneError(phone ? await validatePhoneNumber(phone) : null);
+        setJobError(job || selectedJob ? '' : null);
+        setPasswordError(await validatePassword(password));
+        setConfirmPasswordError(confirmPassword ? confirmPasswordError(await validateConfirmPassword(password,confirmPassword)) : null);
     };
 
-    const validatePassword = () => {
-        const specialCharacterPattern = /[!@#$%^&*(),.?":{}|<>]/;
-        const uppercaseLetterPattern = /[A-Z]/;
-        const lowercaseLetterPattern = /[a-z]/;
-        const numberPattern = /\d/;
-
-        if (!password) {
-            setPasswordError('Password is required');
-        } else if (password.length < 6) {
-            setPasswordError('Password must be at least 6 characters long');
-        } else if (!uppercaseLetterPattern.test(password)) {
-            setPasswordError('Password must contain at least one uppercase letter');
-        } else if (!lowercaseLetterPattern.test(password)) {
-            setPasswordError('Password must contain at least one lowercase letter');
-        } else if (!numberPattern.test(password)) {
-            setPasswordError('Password must contain at least one number');
-        } else if (!specialCharacterPattern.test(password)) {
-            setPasswordError('Password must contain at least one special character');
-        } else {
-            setPasswordError('');
-        }
-    };
-
-    const handleEmailChange = (e) => {
-        setEmail(e.target.value);
-        validateEmail();
-    };
-    const handlePasswordChange = (e) => {
-        setPassword(e.target.value);
-        validatePassword();
-    };
     const submitHandler = async (e) => {
         e.preventDefault();
-        setFormError('');
-        setNameError('');
-        setIdNameError('');
-        setEmailError('');
-        setPhoneError('');
-        setJobError('');
-        setPasswordError('');
-        setConfirmPasswordError('');
-        if (!name) {
-            setNameError('Name is required');
+        if (
+            name &&
+            idName &&
+            email &&
+            phone &&
+            (job || selectedJob) &&
+            password &&
+            confirmPassword === password &&
+            !nameError &&
+            !idNameError &&
+            !emailError &&
+            !phoneError &&
+            !jobError &&
+            !passwordError &&
+            !confirmPasswordError
+        ) {
+            // Your logic for form submission goes here
+            console.log('Form submitted successfully!');
+        }else{
+           setConfirmPasswordError("enter all fields")
         }
-        if (!idName) {
-            setIdNameError('IdName is required');
-        }
-        if (!validatePhoneNumber(phone)) {
-            setPhoneError('Invalid phone number');
-        }
-        if (!selectedJob && !job) {
-            setJobError('Please select a job or type a job');
-        }
-        if (!validatePassword(password)) {
-            setPasswordError('Password should be at least 6 characters long');
-        }
-        if (password !== confirmPassword) {
-            setConfirmPasswordError('Passwords do not match');
-        }
-        //write logic here
     };
 
     return (
@@ -117,7 +85,6 @@ useEffect(() => {
             <FormContainer pos={'fixed'}>
                 <h1 className="text-center w-full font-pS">SC Kingdom</h1>
                 <Form className='form-manager' onSubmit={submitHandler}>
-                    {/* Adjusted styles for form controls */}
                     <Form.Group className="my-3 ml-10">
                         <Form.Control
                             type="text"
@@ -125,13 +92,15 @@ useEffect(() => {
                             value={name}
                             onChange={(e) => {
                                 setName(e.target.value);
-                                setNameError('');
+                                validateForm()
                             }}
-                            className={`w-full max-w-md text-white focus:outline-none ${nameError ? 'is-invalid' : ''}`}
+                            className={`w-full max-w-md text-white focus:outline-none ${nameError ? 'is-invalid' : ''
+                                }`}
                         />
-                        {nameError && <div className="invalid-feedback">{nameError}</div>}
+                        {nameError && (
+                            <div className="invalid-feedback">{nameError}</div>
+                        )}
                     </Form.Group>
-
                     <Form.Group className="my-3 ml-10">
                         <Form.Control
                             type="text"
@@ -139,24 +108,32 @@ useEffect(() => {
                             value={idName}
                             onChange={(e) => {
                                 setIdName(e.target.value);
-                                setIdNameError('');
+                                validateForm()
                             }}
-                            className={`w-full max-w-md text-white focus:outline-none ${idNameError ? 'is-invalid' : ''}`}
+                            className={`w-full max-w-md text-white focus:outline-none ${idNameError ? 'is-invalid' : ''
+                                }`}
                         />
-                        {idNameError && <div className="invalid-feedback">{idNameError}</div>}
+                        {idNameError && (
+                            <div className="invalid-feedback">{idNameError}</div>
+                        )}
                     </Form.Group>
-
                     <Form.Group className="my-3 ml-10">
                         <Form.Control
                             type="email"
                             placeholder="Enter The Email"
                             value={email}
-                            onChange={handleEmailChange}
-                            className={`w-full max-w-md text-white focus:outline-none ${emailError ? 'is-invalid' : ''}`}
+                            onChange={(e) => {
+                                setEmail(e.target.value)
+                                validateForm()
+                            }}
+                            onBlur={() => setEmailError(validateEmail(email))}
+                            className={`w-full max-w-md text-white focus:outline-none ${emailError ? 'is-invalid' : ''
+                                }`}
                         />
-                        {emailError && <div className="invalid-feedback">{emailError}</div>}
+                        {emailError && (
+                            <div className="invalid-feedback">{emailError}</div>
+                        )}
                     </Form.Group>
-
                     <Form.Group className="my-3 ml-10">
                         <Form.Control
                             type="number"
@@ -164,38 +141,47 @@ useEffect(() => {
                             value={phone}
                             onChange={(e) => {
                                 setPhone(e.target.value);
-                                setPhoneError('');
-                            }}
-                            className={`w-full max-w-md text-white focus:outline-none ${phoneError ? 'is-invalid' : ''}`}
-                        />
-                        {phoneError && <div className="invalid-feedback">{phoneError}</div>}
-                    </Form.Group>
+                                validateForm()
 
+                            }}
+                            className={`w-full max-w-md text-white focus:outline-none ${phoneError ? 'is-invalid' : ''
+                                }`}
+                        />
+                        {phoneError && (
+                            <div className="invalid-feedback">{phoneError}</div>
+                        )}
+                    </Form.Group>
                     <Form.Group className="my-3 ml-10">
                         <Form.Select
-                            className={`w-full max-w-md text-white focus:outline-none ${jobError ? 'is-invalid' : ''}`}
+                            className={`w-full max-w-md text-white focus:outline-none ${jobError ? 'is-invalid' : ''
+                                }`}
                             value={selectedJob}
                             onChange={(e) => {
                                 setSelectedJob(e.target.value);
-                                setJobError('');
-                               
+                                validateForm()
                             }}
                         >
-                            <option value="" disabled>Select an option</option>
-                            
-                          {availableJobs?(
-                              availableJobs.map((job)=>{
-                                return(
-                                    <option value={job.name} className="text-black">{job.name}</option>
-                                )
-                            })
-                          ):null}
-                           
-                            
+                            <option value="" disabled>
+                                Select an option
+                            </option>
+                            {availableJobs ? (
+                                availableJobs.map((job) => (
+                                    <option
+                                        key={job.id}
+                                        value={job.name}
+                                        className="text-black"
+                                    >
+                                        {job.name}
+                                    </option>
+                                ))
+                            ) : (
+                                <></>
+                            )}
                         </Form.Select>
-                        {jobError && <div className="invalid-feedback">{jobError}</div>}
+                        {jobError && (
+                            <div className="invalid-feedback">{jobError}</div>
+                        )}
                     </Form.Group>
-
                     <Form.Group className="my-3 ml-10">
                         <Form.Control
                             type="text"
@@ -203,26 +189,37 @@ useEffect(() => {
                             value={job}
                             onChange={(e) => {
                                 setJob(e.target.value);
-                                setJobError('');
-                                
+                                validateForm()
                             }}
-                            className={`w-full max-w-md text-white focus:outline-none ${jobError ? 'is-invalid' : ''}`}
-                            disabled={selectedJob ? true : false}
+                            className={`w-full max-w-md text-white focus:outline-none ${jobError ? 'is-invalid' : ''
+                                }`}
+                            
                         />
-                        {jobError && <div className="invalid-feedback">{jobError}</div>}
+                        {jobError && (
+                            <div className="invalid-feedback">{jobError}</div>
+                        )}
                     </Form.Group>
-
                     <Form.Group className="my-3 ml-10 " controlId="password">
                         <Form.Control
                             type="password"
                             placeholder="Enter The Password"
                             value={password}
-                            onChange={handlePasswordChange}
-                            className={`w-full max-w-md text-white focus:outline-none ${passwordError ? 'is-invalid' : ''}`}
+                            onChange={(e) => {
+                                setPassword(e.target.value)
+                                validateForm()
+                            }}
+                            onBlur={() =>
+                                setPasswordError(validatePassword(password))
+                            }
+                            className={`w-full max-w-md text-white focus:outline-none ${passwordError ? 'is-invalid' : ''
+                                }`}
                         />
-                        {passwordError && <div className="invalid-feedback">{passwordError}</div>}
+                        {passwordError && (
+                            <div className="invalid-feedback">
+                                {passwordError}
+                            </div>
+                        )}
                     </Form.Group>
-
                     <Form.Group className="my-3 ml-10" controlId="confirm_password">
                         <Form.Control
                             type="password"
@@ -230,32 +227,44 @@ useEffect(() => {
                             value={confirmPassword}
                             onChange={(e) => {
                                 setConfirmPassword(e.target.value);
-                                setConfirmPasswordError('');
+                               validateForm()
                             }}
-                            className={`w-full max-w-md text-white focus:outline-none ${confirmPasswordError ? 'is-invalid' : ''}`}
+                            className={`w-full max-w-md text-white focus:outline-none ${confirmPasswordError ? 'is-invalid' : ''
+                                }`}
                         />
-                        {confirmPasswordError && <div className="invalid-feedback">{confirmPasswordError}</div>}
+                        {confirmPasswordError && (
+                            <div className="invalid-feedback">
+                                {confirmPasswordError}
+                            </div>
+                        )}
                     </Form.Group>
-
                     <Row className="py-3">
-                        <NavLink to='/login' className='no-underline text-white ml-0 sm:ml-2 md:ml-4 lg:ml-10 xl:ml-8'>Already have an account? Sign in</NavLink>
+                        <NavLink
+                            to="/login"
+                            className="no-underline text-white ml-0 sm:ml-2 md:ml-4 lg:ml-10 xl:ml-8"
+                        >
+                            Already have an account?  <span>Sign in</span> </NavLink>
+                       
                     </Row>
-
                     <Row>
                         <Form.Group className="my-3 ml-10 ml-11" controlId="checkbox">
                             <input
                                 type="checkbox"
                                 name="checkbox"
                                 id="checkbox"
-                                onChange={(e) => { setIsChecked(!isChecked) }}
+                                onChange={(e) => {
+                                    setIsChecked(!isChecked);
+                                }}
                             />
                             Accept terms and conditions
                         </Form.Group>
                     </Row>
-
-                    <Button type="submit" className="my-3 ml-10 text-white focus:outline-none bg-gradient-to-r from-black 
+                    <Button
+                        type="submit"
+                        className="my-3 ml-10 text-white focus:outline-none bg-gradient-to-r from-black 
                     to-gray-900 hover:from-gray-800 w-full max-w-md py-2 px-4 font-medium text-base tracking-wider shadow-md
-                     rounded-lg transition-colors duration-200 ease-in-out ml-11">
+                     rounded-lg transition-colors duration-200 ease-in-out ml-11"
+                    >
                         Sign Up
                     </Button>
                 </Form>
