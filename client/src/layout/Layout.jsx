@@ -1,6 +1,5 @@
 import React from 'react'
 import { useLocation } from 'react-router-dom'
-import Home from '../Containers/pages/userPages/Home/Home'
 import UserRouter from '../Containers/routes/UserRouter'
 
 function Layout() {

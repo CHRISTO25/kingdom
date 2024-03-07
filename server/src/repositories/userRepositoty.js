@@ -3,11 +3,37 @@ import User from '../entities/user/userModel.js'
 import Company from '../entities/user/companyModel.js';
 import Jobs from '../entities/user/jobsModel.js';
 
+
 // Finding user using email.
 export const findUserByEmail = asyncHandler(async(email)=>{
     try {
 
         const userData = await User.findOne({email});
+        return userData
+    } catch (error) {
+        console.log(error);
+        throw error
+    }
+})
+
+//Finding User with IdName
+export const findUserByIdName = asyncHandler(async(IdName)=>{
+    try {
+
+        const userData = await User.findOne({idName:IdName});
+        return userData
+    } catch (error) {
+        console.log(error);
+        throw error
+    }
+})
+
+
+//Finding User with Number
+export const findUserByNumber = asyncHandler(async(phone)=>{
+    try {
+
+        const userData = await User.findOne({phone});
         return userData
     } catch (error) {
         console.log(error);

@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux'// to connect with backend.
+import { setCredentials } from '../../../../redux/userSlice/authSlice'// to connect with backend.
+import { Link, useNavigate } from 'react-router-dom'
 import { NavLink } from 'react-router-dom';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import userAxios from '../../../../Axios/userAxios';
 import FormContainer from '../../../../Components/common/FormContainer';
-import { validateEmail, validatePassword, validateName, validateIdName, 
-    validatePhoneNumber ,validateConfirmPassword } from '../../../utils/formValidation';
+import {
+    validateEmail, validatePassword, validateName, validateIdName,
+    validatePhoneNumber, validateConfirmPassword
+} from '../../../utils/formValidation';
+import { useWorkerSignupMutation } from '../../../../redux/userSlice/usersApiSlice';
 
 function Signup() {
     const [name, setName] = useState('');
@@ -12,10 +18,11 @@ function Signup() {
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [job, setJob] = useState('');
-    const [selectedJob, setSelectedJob] = useState('');
+    const [jobselect, setjobselect] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isChecked, setIsChecked] = useState('');
+    const [response, setResponse] = useState('')
 
     const [nameError, setNameError] = useState('');
     const [idNameError, setIdNameError] = useState('');
@@ -27,7 +34,8 @@ function Signup() {
 
     const [availableJobs, setAvailableJobs] = useState('');
 
-    // backend calls
+    // backend calls for the jobs
+
     useEffect(() => {
         const fetchUsers = async () => {
             try {
@@ -39,22 +47,27 @@ function Signup() {
         };
         fetchUsers();
     }, []);
-
-
-
-
-    // Validations on form submission
+ // Validations on form submission
     const validateForm = async () => {
-       
+
         setNameError(name ? await validateName(name) : null);
         setIdNameError(idName ? await validateIdName(idName) : null);
         setEmailError(email ? await validateEmail(email) : null);
         setPhoneError(phone ? await validatePhoneNumber(phone) : null);
-        setJobError(job || selectedJob ? '' : null);
+        setJobError(job || jobselect ? '' : null);
         setPasswordError(await validatePassword(password));
-        setConfirmPasswordError(confirmPassword ? confirmPasswordError(await validateConfirmPassword(password,confirmPassword)) : null);
+        setConfirmPasswordError(confirmPassword ? confirmPasswordError(await validateConfirmPassword(password, confirmPassword)) : null);
     };
-
+    //call for the signup.
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { userInfo } = useSelector((state) => state.auth)
+    useEffect(() => {
+        if (userInfo) {
+            navigate('/')
+        }
+    }, [navigate, userInfo])
+    const [signup, { isLoading }] = useWorkerSignupMutation()
     const submitHandler = async (e) => {
         e.preventDefault();
         if (
@@ -62,7 +75,7 @@ function Signup() {
             idName &&
             email &&
             phone &&
-            (job || selectedJob) &&
+            (job || jobselect) &&
             password &&
             confirmPassword === password &&
             !nameError &&
@@ -73,13 +86,23 @@ function Signup() {
             !passwordError &&
             !confirmPasswordError
         ) {
-            // Your logic for form submission goes here
-            console.log('Form submitted successfully!');
-        }else{
-           setConfirmPasswordError("enter all fields")
+            try {
+                console.log('Form submitted successfully!');
+                const res = await signup({ name, idName, email, jobselect, job, phone, password }).unwrap();//this login is called from userApiSlice
+                const Token = res.token
+                console.log(Token, "ithaaanu mwne token");
+                if (Token) {
+                    dispatch(setCredentials({ Token }))
+                    navigate('/')
+                }
+                setResponse(res.data)
+            } catch (error) {
+
+            }
+        } else {
+            setConfirmPasswordError("enter all fields")
         }
     };
-
     return (
         <div className='FormContainer'>
             <FormContainer pos={'fixed'}>
@@ -155,9 +178,9 @@ function Signup() {
                         <Form.Select
                             className={`w-full max-w-md text-white focus:outline-none ${jobError ? 'is-invalid' : ''
                                 }`}
-                            value={selectedJob}
+                            value={jobselect}
                             onChange={(e) => {
-                                setSelectedJob(e.target.value);
+                                setjobselect(e.target.value);
                                 validateForm()
                             }}
                         >
@@ -178,6 +201,7 @@ function Signup() {
                                 <></>
                             )}
                         </Form.Select>
+
                         {jobError && (
                             <div className="invalid-feedback">{jobError}</div>
                         )}
@@ -193,7 +217,7 @@ function Signup() {
                             }}
                             className={`w-full max-w-md text-white focus:outline-none ${jobError ? 'is-invalid' : ''
                                 }`}
-                            
+
                         />
                         {jobError && (
                             <div className="invalid-feedback">{jobError}</div>
@@ -227,7 +251,7 @@ function Signup() {
                             value={confirmPassword}
                             onChange={(e) => {
                                 setConfirmPassword(e.target.value);
-                               validateForm()
+                                validateForm()
                             }}
                             className={`w-full max-w-md text-white focus:outline-none ${confirmPasswordError ? 'is-invalid' : ''
                                 }`}
@@ -244,8 +268,9 @@ function Signup() {
                             className="no-underline text-white ml-0 sm:ml-2 md:ml-4 lg:ml-10 xl:ml-8"
                         >
                             Already have an account?  <span>Sign in</span> </NavLink>
-                       
+
                     </Row>
+                    <p>{response}</p>
                     <Row>
                         <Form.Group className="my-3 ml-10 ml-11" controlId="checkbox">
                             <input

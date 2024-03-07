@@ -1,4 +1,4 @@
-import { findJobByName, saveJobs, saveUser } from "../../repositories/userRepositoty.js";
+import { findJobByName, findUserByIdName, findUserByNumber, saveJobs, saveUser } from "../../repositories/userRepositoty.js";
 import { findUserByEmail } from '../../repositories/userRepositoty.js';
 import { saltPassword } from "../../services/bcrypt.js"
 import { generateUserToken } from '../../middlewares/createToken.js';
@@ -21,6 +21,14 @@ export const createUser = async (res, name, idName, email, jobselect, job, phone
   if (existingUser) {
     return { data: "Already have an account" }
   } else {
+    const existingIdName =  await findUserByIdName(idName)
+    if (existingIdName) {
+      return { data: "UserName already taken ....please suggest another user name" }
+    }
+    const existingNumber =  await findUserByNumber(phone) 
+    if (existingNumber) {
+      return { data: "This phone number has already been taken...." }
+    }
     const jobs = await jobSet.toLocaleLowerCase()
     const JobExists = await findJobByName(jobs)
 

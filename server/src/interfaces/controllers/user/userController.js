@@ -7,7 +7,6 @@ import { logout } from '../../../middlewares/logout.js';
 import { allJobs } from '../../../repositories/userRepositoty.js';
 
 
-
 //Login user  - public  - http://localhost:5000/api/users/
 export const userLogin = asyncHandler(async (req, res) => {
   try {
@@ -29,9 +28,9 @@ export const userLogin = asyncHandler(async (req, res) => {
 // user signup ====================public
 export const userSignup = asyncHandler(async (req, res) => {
   try {
-    const { name, idName, email,jobselect,job, phone, password } = await req.body;
+    const { name, idName, email, jobselect, job, phone, password } = await req.body;
     console.log(name, idName, email, job, phone, password);
-    const signupResponse = await createUser(res, name, idName, email,jobselect, job, phone, password)
+    const signupResponse = await createUser(res, name, idName, email, jobselect, job, phone, password)
     const { data, token } = signupResponse
     if (token) {
       res.json({ data, token })
@@ -75,12 +74,13 @@ export const userLogout = asyncHandler(async (req, res) => {
 
 
 // geting all jobs 
-export const availableJobs =  asyncHandler(async(req,res)=>{
+export const availableJobs = asyncHandler(async (req, res) => {
   try {
-     const jobs = await allJobs()
-     res.json({jobs})
+    const jobs = await allJobs()
+    res.json({ jobs })
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: "Something error happened" });
   }
 })
+
